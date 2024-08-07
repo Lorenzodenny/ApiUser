@@ -1,0 +1,45 @@
+﻿USE [UserDb]
+GO
+/****** Object:  StoredProcedure [dbo].[AddUserWithLog]    Script Date: 06/08/2024 18:53:23 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[AddUserWithLog]
+    @FirstName NVARCHAR(50),
+    @LastName NVARCHAR(50),
+    @Email NVARCHAR(100),
+    @RegistrationDate DATETIME,
+    @Operation NVARCHAR(100),
+    @Timestamp DATETIME
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Inserisci l'utente
+        INSERT INTO Users (FirstName, LastName, Email, RegistrationDate)
+        VALUES (@FirstName, @LastName, @Email, @RegistrationDate);
+
+        -- Ottieni l'ID dell'utente appena inserito
+        DECLARE @UserId INT;
+        SET @UserId = SCOPE_IDENTITY();
+
+        -- Inserisci il log
+        INSERT INTO AuditLogs (UserId, Operation, Timestamp)
+        VALUES (@UserId, @Operation, @Timestamp);
+
+        -- Commit della transazione
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        -- Rollback della transazione in caso di errore
+        ROLLBACK TRANSACTION;
+
+        -- Rilancia l'errore
+        THROW;
+    END CATCH;
+END
