@@ -1,4 +1,5 @@
 using UserManagementAPI.Extensions;
+using UserManagementAPI.Model.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,5 +10,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline using the extension method
 app.ConfigureApplication();
+
+
 
 app.Run();

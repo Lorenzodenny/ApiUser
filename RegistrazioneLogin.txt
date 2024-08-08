@@ -1,0 +1,11 @@
+﻿{
+   "email": "testi@example.com",
+    "password": "Password123!",
+    "confirmPassword": "Password123!",
+  "phoneNumber": "3334747805"
+}
+{
+    "email": "testi@example.com",
+    "password": "Password123!",
+    "rememberMe": true
+}

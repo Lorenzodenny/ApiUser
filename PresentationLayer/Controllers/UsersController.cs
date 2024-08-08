@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UserManagementAPI.BusinessLayer;
 using UserManagementAPI.BusinessLayer.Service;
 using UserManagementAPI.DataAccessLayer;
@@ -6,8 +7,8 @@ using UserManagementAPI.Model;
 
 namespace UserManagementAPI.PresentationLayer.Controllers
 {
-    
 
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -20,6 +21,7 @@ namespace UserManagementAPI.PresentationLayer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "User,Admin")] // Accessibile da User e Admin
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
@@ -27,6 +29,7 @@ namespace UserManagementAPI.PresentationLayer.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "User,Admin")] // Accessibile da User e Admin
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -38,6 +41,7 @@ namespace UserManagementAPI.PresentationLayer.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "User,Admin")] // Accessibile da User e Admin
         public async Task<IActionResult> PostUser([FromBody] User user)
         {
             await _userService.AddUserAsync(user);
@@ -45,6 +49,7 @@ namespace UserManagementAPI.PresentationLayer.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "User,Admin")] // Accessibile da User e Admin
         public async Task<IActionResult> PutUser(int id, [FromBody] User user)
         {
             if (id != user.Id)
@@ -57,6 +62,7 @@ namespace UserManagementAPI.PresentationLayer.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // Accessibile solo da Admin
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteUserAsync(id);

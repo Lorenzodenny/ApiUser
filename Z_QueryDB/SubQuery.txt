@@ -1,0 +1,24 @@
+﻿Subquery di filtraggio nel WHERE
+
+SELECT
+FirstName
+FROM
+Users
+WHERE
+Id IN (SELECT UserId FROM AuditLogs WHERE Operation = 'Creazione utente');
+
+SUbquery nel FROM come se avenisse tra due tabelle 
+
+SELECT
+temp.FirstName,
+temp.Operation
+FROM
+(SELECT u.FirstName, a.Operation FROM Users u INNER JOIN AuditLogs a ON u.Id = a.UserId) AS temp
+
+Subquery nel SELECT, creera un'altro record
+
+SELECT
+FirstName,
+(SELECT COUNT(*) FROM AuditLogs a WHERE a.UserId = u.Id) AS NumeroOperazioni
+FROM
+Users u;

@@ -1,0 +1,18 @@
+﻿CREATE VIEW UserAuditLogView AS
+SELECT 
+    u.Id AS UserId,
+    u.FirstName,
+    u.LastName,
+    u.Email,
+    u.RegistrationDate,
+    al.Operation,
+    al.Timestamp
+FROM 
+    Users u
+JOIN 
+    AuditLogs al ON u.Id = al.UserId;
+
+
+-- select
+
+SELECT * FROM UserAuditLogView;
