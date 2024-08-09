@@ -107,16 +107,42 @@ public class AccountController : ControllerBase
         return BadRequest(result.Errors);
     }
 
+    // Creare un Admin
+    [HttpPost("assign-admin")]
+    public async Task<IActionResult> AssignAdminRole([FromBody] string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
 
-    private string GenerateJwtToken(ApplicationUser user)
+        var result = await _userManager.AddToRoleAsync(user, "Admin");
+        if (result.Succeeded)
+        {
+            return Ok("User assigned to Admin role successfully");
+        }
+
+        return BadRequest(result.Errors);
+    }
+
+
+    private async Task<string> GenerateJwtToken(ApplicationUser user)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
 
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        // Ottieni i ruoli dell'utente
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.Id)
+    };
+
+        // Aggiungi i ruoli ai claims
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -130,4 +156,5 @@ public class AccountController : ControllerBase
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
 }

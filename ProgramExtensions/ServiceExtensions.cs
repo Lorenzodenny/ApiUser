@@ -18,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using UserManagementAPI.Model.ViewModel;
 
 namespace UserManagementAPI.Extensions
 {
@@ -86,6 +87,9 @@ namespace UserManagementAPI.Extensions
 
             // registro l'interfaccia e la classe UnitOfWork, per le transizioni
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Registro l'iniziatore di ruoli
+            services.AddScoped<RoleInitializer>();
 
             // Configura FluentValidation per registrare tutti i validator presenti nell'assembly
             services.AddFluentValidationAutoValidation()
