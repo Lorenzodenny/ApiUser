@@ -15,12 +15,14 @@ public class AccountController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, ILogger<AccountController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _configuration = configuration;
+        _logger = logger;
     }
 
     [HttpPost("register")]
@@ -90,22 +92,38 @@ public class AccountController : ControllerBase
     [HttpDelete("delete")]
     public async Task<IActionResult> DeleteAccount()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+        _logger.LogInformation("Attempting to delete user with ID: {UserId}", userId);
+
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
+            _logger.LogWarning("User not found with ID: {UserId}", userId);
             return NotFound("User not found");
         }
 
         var result = await _userManager.DeleteAsync(user);
-
         if (result.Succeeded)
         {
+            _logger.LogInformation("User with ID: {UserId} deleted successfully", userId);
             return Ok(new { Message = "Account deleted successfully" });
         }
-
-        return BadRequest(result.Errors);
+        else
+        {
+            _logger.LogError("Failed to delete user with ID: {UserId}. Errors: {Errors}", userId, result.Errors);
+            return BadRequest(result.Errors);
+        }
     }
+
+
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        return Ok(new { Message = "Logout successful" });
+    }
+
 
     // Creare un Admin
     [HttpPost("assign-admin")]
@@ -138,7 +156,7 @@ public class AccountController : ControllerBase
     {
         new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(ClaimTypes.NameIdentifier, user.Id)
+        new Claim("UserId", user.Id)  // Usa un claim personalizzato
     };
 
         // Aggiungi i ruoli ai claims
@@ -156,5 +174,6 @@ public class AccountController : ControllerBase
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
 
 }
