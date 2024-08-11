@@ -70,7 +70,11 @@ namespace UserManagementAPI.Extensions
             var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"];
 
-            
+            // Registra HttpClient
+            services.AddHttpClient("SitoPokemon", client => // questo nome è fittizio basta che combacia con il nome nel controller che userà questo endpoint
+            {
+                client.BaseAddress = new Uri("https://pokeapi.co/api/v2/");
+            });
 
 
             // Register repository and service interfaces

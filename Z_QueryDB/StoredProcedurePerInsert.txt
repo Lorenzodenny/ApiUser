@@ -1,6 +1,6 @@
 ﻿USE [UserDb]
 GO
-/****** Object:  StoredProcedure [dbo].[AddUserWithLog]    Script Date: 06/08/2024 18:53:23 ******/
+/****** Object:  StoredProcedure [dbo].[AddUserWithLog]    Script Date: 10/08/2024 12:38:58 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -16,6 +16,9 @@ ALTER PROCEDURE [dbo].[AddUserWithLog]
 AS
 BEGIN
     SET NOCOUNT ON;
+
+	-- Imposta il livello di isolamento tra i 4 possibili READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE.
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 
     BEGIN TRANSACTION;
 

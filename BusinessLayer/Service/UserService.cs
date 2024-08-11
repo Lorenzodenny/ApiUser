@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UserManagementAPI.DataAccessLayer;
 using UserManagementAPI.Abstract;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace UserManagementAPI.BusinessLayer.Service
 {
@@ -53,11 +54,12 @@ namespace UserManagementAPI.BusinessLayer.Service
                 }
             }
 
-
+            // Update con gestione dell'islamento della transizione da .Net
 
             public async Task UpdateUserAsync(User user)
             {
-                _unitOfWork.BeginTransaction();
+                // Avvia una transazione con il livello di isolamento Serializable
+                _unitOfWork.BeginTransaction(IsolationLevel.Serializable);
 
                 try
                 {

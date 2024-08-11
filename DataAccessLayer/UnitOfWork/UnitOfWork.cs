@@ -1,20 +1,25 @@
 ﻿using UserManagementAPI.Abstract;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserManagementAPI.DataAccessLayer.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
+        private IDbContextTransaction _transaction;
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
         }
-
-        public void BeginTransaction()
+        // Gestire isolamento da codice
+        public void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
-            _context.Database.BeginTransaction();
+            _transaction = _context.Database.BeginTransaction(isolationLevel);
         }
+
 
         public async Task CompleteAsync()
         {
@@ -23,13 +28,12 @@ namespace UserManagementAPI.DataAccessLayer.UnitOfWork
 
         public void Commit()
         {
-            _context.Database.CommitTransaction();
+            _transaction?.Commit();
         }
 
         public void Rollback()
         {
-            _context.Database.RollbackTransaction();
+            _transaction?.Rollback();
         }
     }
-
 }

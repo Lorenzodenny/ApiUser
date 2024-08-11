@@ -1,0 +1,13 @@
+﻿PING
+
+ping pokeapi.co   ==> Il nome pokeapi.co è quello recistrato nel service con httpclient
+
+
+TRACER
+
+tracert pokeapi.co
+
+
+DNS REVERSE
+
+nslookup 172.67.195.193 8.8.8.8

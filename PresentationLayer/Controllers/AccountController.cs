@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -56,7 +57,7 @@ public class AccountController : ControllerBase
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    var token = GenerateJwtToken(user);
+                    var token = await GenerateJwtToken(user);
                     return Ok(new { Token = token });
                 }
             }
@@ -143,6 +144,22 @@ public class AccountController : ControllerBase
 
         return BadRequest(result.Errors);
     }
+
+    // Action per testare IIS
+    [HttpGet("all-users")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = _userManager.Users.Select(u => new
+        {
+            u.UserName,
+            u.Email,
+            u.PhoneNumber
+        }).ToList();
+
+        return Ok(users);
+    }
+
+
 
 
     private async Task<string> GenerateJwtToken(ApplicationUser user)

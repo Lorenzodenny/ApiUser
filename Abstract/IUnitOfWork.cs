@@ -1,9 +1,11 @@
-﻿namespace UserManagementAPI.Abstract
+﻿using System.Data;
+
+namespace UserManagementAPI.Abstract
 {
     public interface IUnitOfWork
     {
         Task CompleteAsync();
-        void BeginTransaction();
+        public void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
         void Commit();
         void Rollback();
     }
